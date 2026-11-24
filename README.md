@@ -1,128 +1,87 @@
+# PeoplePay — Payroll & Attendance Management
 
- Inventory Management System
+A connected payroll and attendance system built for the DBMS capstone. The React/Vite web app calls one Express API, which uses PostgreSQL for the canonical relational schema, payroll calculations, validation, reports, and access control.
 
-This is a MERN stack (MongoDB, Express, React, Node.js) based Inventory Management System that helps businesses efficiently manage their orders, suppliers, inventory, sales, employees, and reports. 
-The application includes an easy-to-use UI with Bootstrap for styling and offers a dark mode option for better accessibility. 
+## Capstone phase map
 
-Features
+| Phase | Deliverables |
+|---|---|
+| 1 — Data model | `PeoplePay/backend/docs/DATA_MODEL.md`, `sql/01_schema.sql` |
+| 2 — Procedural implementation | Salary/tax functions, payroll procedure, guards/triggers, and demo data in `sql/01_schema.sql` and `sql/02_seed.sql` |
+| 3 — Reports & optimization | Monthly attendance, salary slip and late-mark queries in `sql/03_reports_and_plans.sql`; indexes defined in schema |
+| 4 — Security & tests | HR/Admin and employee access checks in `backend/server.js`; SQL cases in `sql/04_test_cases.sql`; payroll and salary changes use transactions |
+| 5 — Integrated UI | Role-aware React UI in `PeoplePay/frontend`; setup and operating notes below |
 
-- Dashboard
-  - Overview of system statistics and key performance indicators.
+## Requirements
 
-- Orders Section
-  - Add Orders: Easily create new orders.
-  - View Orders: View all existing orders.
-  - Manage Orders: Update or delete orders as needed.
+- Node.js 18 or later
+- PostgreSQL 14 or later (the schema uses `btree_gist` for exclusion constraints)
+- `psql` available on PATH for database scripts
 
-- Suppliers Section
-  - Add Supplier: Add new supplier details to the system.
-  - Manage Supplier: Edit or remove suppliers from the database.
+## Start locally
 
-- Inventory Section
-  - Add Inventory: Add new inventory items.
-  - Manage Inventory: View, update, or delete inventory items.
+1. Create the database and application login. For a local development database, from `psql` as a database administrator:
 
-- Sales and Report Section
-  - Add Sale Record: Register new sales in the system.
-  - Manage Sales: View, update, or delete sales records.
-  - Generate Reports: Create reports based on sales data.
-
-- Employee Section
-  - Add Employee: Add new employees.
-  - Manage Employees: View, update, or delete employee records.
-
-- Settings
-  - Dark Mode Option: Toggle between light and dark modes.
-
-- Authentication
-  - Login: Secure user login functionality.
-  - Signup: New users can register for the system.
-  - Logout: Safely log out from the system.
-
- Technologies Used
-
-- Frontend: React, Vite, CSS, Bootstrap
-- Backend: Node.js, Express.js
-- Database: MongoDB
-- Styling: Bootstrap, Custom CSS
-
- Installation and Setup
-
-To run this project locally, follow these steps:
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/tharumax123/MERN-Inventory-Management-System.git
-   cd merninventory
+   ```sql
+   CREATE USER payroll_app WITH PASSWORD 'change_me';
+   CREATE DATABASE payroll_attendance OWNER payroll_app;
    ```
 
-2. Install dependencies:
+2. Load the schema and sample data from the backend folder:
 
-   For the frontend
+   ```powershell
+   cd PeoplePay/backend
+   psql "postgresql://payroll_app:change_me@localhost:5432/payroll_attendance" -v ON_ERROR_STOP=1 -f sql/01_schema.sql
+   psql "postgresql://payroll_app:change_me@localhost:5432/payroll_attendance" -v ON_ERROR_STOP=1 -f sql/02_seed.sql
+   Copy-Item .env.example .env
+   ```
 
-   ```bash
-   cd frontend
+   Edit `.env`; set `DATABASE_URL` to the same connection and replace `JWT_SECRET` with a long random value. The demo seed uses `pgcrypto` to hash passwords.
+
+3. Install and start the API:
+
+   ```powershell
    npm install
+   npm start
    ```
 
-   For the backend:
+4. In a second terminal, start the UI:
 
-   ```bash
-   cd ../backend
+   ```powershell
+   cd PeoplePay/frontend
    npm install
-   ```
-3. Run the backend server:
-
-   ```bash
-   cd node sever.js
-   ```
-
-4. Run the frontend server:
-
-   Go back to the frontend directory:
-
-   ```bash
-   cd ../frontend
    npm run dev
    ```
 
-5. Access the application:
+   Open `http://localhost:5173`. To point the browser to another API host, define `VITE_API_URL` before `npm run dev` (default `http://localhost:5000/api`).
 
-   Open your browser and go to  `http://localhost:5173/`
+## Demo accounts
 
- Usage
+- HR/Admin: `admin@payroll.local` / `Admin123!`
+- Employee: `aarav.sharma@example.com` / `Employee123!`
 
-- Login or Signup to access the system.
-- Navigate between sections using the sidebar menu (Orders, Suppliers, Inventory, Sales, Employees, etc.).
-- Switch between light and dark mode in the settings section.
-- Log out when done.
+Other seeded employee accounts for Diya, Ishaan, and employees 5–10 are not created; HR can add accounts through SQL for demonstrations. Change demo passwords and JWT secret for any non-demo deployment. The app intentionally does not expose public signup or an account-creation endpoint.
 
- Screenshots
-![image](https://github.com/user-attachments/assets/059dc76f-836e-438d-b9d3-adba90b79b7a)
-![image](https://github.com/user-attachments/assets/28454e0b-11e2-4667-925a-346e650095b7)
-![image](https://github.com/user-attachments/assets/03f4a0bd-fa51-4279-95d2-256a7f0d7b6a)
-![image](https://github.com/user-attachments/assets/66523877-57ff-4a02-bd57-cef353bc2590)
-![image](https://github.com/user-attachments/assets/5b95ee0c-c293-48d1-a97b-6cb61e7b42a4)
-![image](https://github.com/user-attachments/assets/cc921ed0-33ef-454d-8c22-bdb02863721d)
-![image](https://github.com/user-attachments/assets/d648616f-987f-4b8f-ac4e-a52716a1f48d)
-![image](https://github.com/user-attachments/assets/871b896b-ebfd-4362-975b-9dad7096087b)
-![image](https://github.com/user-attachments/assets/089160ef-8948-4a99-8bac-15c468e88fa6)
-![image](https://github.com/user-attachments/assets/d005ba0a-8aa2-4cb9-bc70-72c00da208a1)
-![image](https://github.com/user-attachments/assets/2770f14a-5558-4378-a219-13c719f3ff84)
+## What to demonstrate
 
-Contributing
+- Sign in as HR, record attendance, submit/review leave, create an employee/salary record, run a monthly payroll, and view reports.
+- Sign in as the demo employee. The API scopes employee lists, attendance, leave, payroll and salary slips to the employee ID from the signed token; changing a request parameter cannot expose another employee.
+- The payroll procedure is run inside an API transaction. Salary-history changes also use a transaction. A failed query rolls back before the connection is returned to the pool.
 
-Contributions are welcome! If you find bugs or have suggestions for new features, feel free to open an issue or submit a pull request.
+## Database scripts and verification
 
- License
+Run all scripts from `PeoplePay/backend` in this order: `sql/01_schema.sql`, `sql/02_seed.sql`, then `sql/04_test_cases.sql`. `npm test` runs API access-control tests without requiring PostgreSQL; `npm run test:sql` checks sample coverage, a known payroll result, and rejection of invalid salary, duplicate attendance, future attendance, and overlapping approved leave. SQL tests print PASS notices and stop on an unexpected result. The SQL test is not intended to reset an existing database.
 
-This project is licensed under the MIT License.
+For the Phase 3 plan comparison, first run `sql/05_performance_fixture.sql` to add idempotent synthetic history for the same 10 sample employees. Then run `sql/03_reports_and_plans.sql`; it shows the required reports and `EXPLAIN (ANALYZE, BUFFERS)` before and after adding the attendance date index. Capture both actual plan outputs for the submission; plan selection and timings depend on PostgreSQL version and hardware.
 
-Contact
+## Notes
 
-For any questions or feedback, feel free to contact me:
+- All monetary values use `numeric`, not floating point.
+- Attendance has one row per employee per workday; approved leave periods cannot overlap.
+- The tax model is intentionally transparent for coursework: taxable monthly gross multiplied by the effective salary tax rate. It is not intended as jurisdiction-specific tax advice.
+- HR/Admin can view and manage workforce records, attendance, leave, salaries, and payroll. Employees have read-only access to their own records. Sensitive endpoints are protected in the API, not just hidden in the UI.
+- SQL privileges are typically administered separately for production. This coursework app uses application-level RBAC and a database login for the API.
 
-- Email: your-tharushabishan8@gmail.com
-- GitHub: [https://github.com/tharumax123]
+## Real-world use and scaling
 
+For a small company, HR can record daily attendance, approve leave, maintain effective-dated salary rates, and generate monthly payslips from one PostgreSQL database. Employees use the same app to inspect only their own time and pay history. As the firm grows, keep the API stateless behind a load balancer, use a managed PostgreSQL service with backups and connection pooling, retain the employee/date indexes, and partition high-volume attendance and payroll tables by month or year. Multi-country deployments should add currency, timezone, holiday calendars, and jurisdiction-specific payroll rules before calculating actual pay.
